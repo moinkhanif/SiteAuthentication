@@ -9,7 +9,7 @@
   <body>
     <script nonce="secretkey" type="text/javascript" src="https://apps-qa.bazaarvoice.com/deployments/bv-display-qa/main_site/production/en_US/bv.js"></script>
     <script nonce="secretkey">
-      global.$BV.ui('rr', 'submit_generic', function () {
+      $BV.ui('rr', 'submit_generic', function () {
         global.BV.product_picker.trigger('show');
       });
     </script>
