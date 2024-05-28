@@ -4,6 +4,7 @@ const client = searchParams.get('client') || '';
 const dz = searchParams.get('dz') || '';
 const locale = searchParams.get('locale') || 'en_US';
 const env = searchParams.get('env') || 'qa';
+const productId = searchParams.get('productId') || 'product1';
 let message = '';
 let generalMessage = '';
 
@@ -99,7 +100,7 @@ if (client === '' || dz === '') {
       const productDIV = document.createElement('div');
       productDIV.id = 'product';
       productDIV.setAttribute('data-bv-show', 'reviews');
-      productDIV.setAttribute('data-bv-product-id', 'product1');
+      productDIV.setAttribute('data-bv-product-id', productId);
       document.body.appendChild(productDIV);
     } else {
       messageDiv.classList.add('error');
