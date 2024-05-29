@@ -9,15 +9,22 @@
   </head>
   <body>
     <header role="banner" style="text-align: center;">
-       TEST PAGE
+       TEST PAGE w inline_ratings
     </header>
 
     <main role="main">
       <h1>bv-loader-qa/testkpv1 [QA]</h1>
+      <div id="BVRRInlineRating-productId123">
+      </div>      
       <div data-bv-show="rating_summary" data-bv-product-id="product1"></div>
       <div data-bv-show="reviews" data-bv-product-id="product1"></div>
       <div data-bv-show="questions" data-bv-product-id="product1"></div>
-
+      <script>
+        $BV.ui( 'rr', 'inline_ratings', {
+          productIds : ['productId123'],
+            containerPrefix : 'BVRRInlineRating'
+          });
+      </script>
     </main>
     
     <footer role="contentinfo">
