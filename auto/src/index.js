@@ -32,11 +32,12 @@ if (client === '' || dz === '') {
     if (result || appVersion === 'v1') {
       if (containerPage) {
         // clear everything inside document with container page
-        document.body.innerHTML = "";
-        document.head.innerHTML = "";
+        // document.body.innerHTML = "";
+        // document.head.innerHTML = "";
         // load container
         console.log('appVersion', appVersion, scoutfile)
-        document.write(V2_HTML_CONTAINER(scoutfile, appVersion));
+        // document.write(V2_HTML_CONTAINER(scoutfile, appVersion));
+        V2_HTML_CONTAINER(scoutfile, appVersion);
         return;
       }
       messageDiv.classList.add('success');
