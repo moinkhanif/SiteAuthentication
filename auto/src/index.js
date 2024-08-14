@@ -1,133 +1,134 @@
 import { V2_HTML_CONTAINER } from "./constants";
-import { appendCapabilities, generateScoutURL, loadScoutAndProduct, validateScout } from "./utils.js";
+import {
+  appendCapabilities,
+  generateInputForm,
+  generateScoutURL,
+  loadScoutAndProduct,
+  validateScout,
+} from "./utils.js";
 
 // get search params
 const searchParams = new URLSearchParams(window.location.search);
-const client = searchParams.get('client') || '';
-const dz = searchParams.get('dz') || '';
-const locale = searchParams.get('locale') || 'en_US';
-const env = searchParams.get('env') || 'qa';
-const productId = searchParams.get('productId') || 'product1';
-const appName = searchParams.get('appName') || 'reviews';
-const containerPage = searchParams.get('containerPage') || 'false';
-const appVersion = searchParams.get('appVersion') || 'v2';
-const rawHTML = searchParams.get('rawHTML') || '';
-console.log('rawHTML11', rawHTML)
-let message = '';
-let generalMessage = '';
+const params = [
+  { name: "client", default: "" },
+  { name: "dz", default: "" },
+  { name: "locale", default: "en_US" },
+  { name: "env", default: "qa" },
+  { name: "productId", default: "product1" },
+  { name: "appName", default: "reviews" },
+  { name: "containerPage", default: "false" },
+  { name: "appVersion", default: "v2" },
+  { name: "rawHTML", default: "" },
+];
 
-if (client === '' || dz === '') {
-  message = 'client and dz are required';
+const extractedParams = params.reduce((acc, param) => {
+  acc[param.name] = searchParams.get(param.name) || param.default;
+  return acc;
+}, {});
+
+const {
+  client,
+  dz,
+  locale,
+  env,
+  productId,
+  appName,
+  containerPage,
+  appVersion,
+  rawHTML,
+} = extractedParams;
+
+let message = "";
+let generalMessage = "";
+
+// create a form with the input fields from the params
+const form = document.createElement("form");
+form.id = "inputForm";
+params.forEach((param) => {
+  const input = document.createElement("input");
+  input.type = "text";
+  input.name = param.name;
+  input.placeholder = param.default;
+  input.value = extractedParams[param.name];
+  form.appendChild(input);
+});
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const formData = new FormData(form);
+  const client = formData.get("client");
+  const dz = formData.get("dz");
+  const locale = formData.get("locale");
+  const env = formData.get("env");
+  const productId = formData.get("productId");
+  const appName = formData.get("appName");
+  const containerPage = formData.get("containerPage");
+  const appVersion = formData.get("appVersion");
+  const rawHTML = formData.get("rawHTML");
+  window.location.search = `?client=${client}&dz=${dz}&locale=${locale}&env=${env}&productId=${productId}&appName=${appName}&containerPage=${containerPage}&appVersion=${appVersion}&rawHTML=${rawHTML}`;
+});
+document.body.appendChild(form);
+
+if (client === "" || dz === "") {
+  message = "client and dz are required";
   console.error(message);
-} else { 
-  // const constructSubENV = env === 'qa' ? `-${env}` : '';
-  // const constructENV = env == 'stg' ? 'staging' : 'production';
-  
+} else {
   const scoutfile = generateScoutURL(client, dz, env, locale, appVersion);
-  // `https://apps${constructSubENV}.bazaarvoice.com/deployments/${client}/${dz}/${constructENV}/${locale}/bv.js`
-  console.log('containerPage', containerPage, typeof containerPage)
-  if (appVersion === 'v2') {
-    console.log('appVersion', appVersion, scoutfile)
-  validateScout(scoutfile).then((result) => {
-    console.log('result', result)
-    const messageDiv = document.createElement('p');
-    messageDiv.classList.add('message');
-    if (result || appVersion === 'v1') {
-      if (containerPage === 'true') {
-        // clear everything inside document with container page
-        // document.body.innerHTML = "";
-        // document.head.innerHTML = "";
-        // load container
-        console.log('appVersion', appVersion, scoutfile)
-        // document.write(V2_HTML_CONTAINER(scoutfile, appVersion));
-        V2_HTML_CONTAINER(scoutfile, appVersion);
-        return;
-      }
-      messageDiv.classList.add('success');
-      messageDiv.innerHTML = 'bv.js loaded successfully!';
-      message = 'success';
-      document.body.appendChild(messageDiv)
 
-      // add the bv.js url to page
-      const urlDiv = document.createElement('a');
-      urlDiv.href = scoutfile;
-      urlDiv.innerHTML = scoutfile;
-      document.body.appendChild(urlDiv);
+  if (appVersion === "v2") {
+    validateScout(scoutfile).then((result) => {
+      const messageDiv = document.createElement("p");
+      messageDiv.classList.add("message");
+      if (result || appVersion === "v1") {
+        if (containerPage === "true") {
+          V2_HTML_CONTAINER(scoutfile, appVersion);
+          return;
+        }
+        messageDiv.classList.add("success");
+        messageDiv.innerHTML = "bv.js loaded successfully!";
+        message = "success";
+        document.body.appendChild(messageDiv);
 
-      // add description of the response
-      // remove all stars from text
-      const filedata = result.filedata.replace(/\*/g, '');
-      const descriptionList = filedata.split('\n');
-      const descriptionDiv = document.createElement('ul');
-      descriptionDiv.classList.add('description');
+        // add the bv.js url to page
+        const urlDiv = document.createElement("a");
+        urlDiv.href = scoutfile;
+        urlDiv.innerHTML = scoutfile;
+        document.body.appendChild(urlDiv);
 
-      appendCapabilities(descriptionList, descriptionDiv);
-      document.body.appendChild(descriptionDiv);
-  
-      // add input form area for any raw html the user wants to append to the body
-      const form = document.createElement('form');
-      form.id = 'rawHTMLForm';
-      form.innerHTML = `<textarea id="rawHTMLInput" rows="10" cols="50">${rawHTML}</textarea>`;
-      const submitButton = document.createElement('button');
-      submitButton.type = 'submit';
-      submitButton.innerHTML = 'Append HTML';
-      form.appendChild(submitButton);
+        // add description of the response
+        // remove all stars from text
+        const filedata = result.filedata.replace(/\*/g, "");
+        const descriptionList = filedata.split("\n");
+        const descriptionDiv = document.createElement("ul");
+        descriptionDiv.classList.add("description");
 
-      // handle submit
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const rawHTML = document.getElementById('rawHTMLInput').value;
-        const rawHTMLDiv = document.createElement('div');
-        rawHTMLDiv.innerHTML = rawHTML;
-        document.body.appendChild(rawHTMLDiv.innerHTML);
-        // also update url so it can be picked later or the form reloaded
-        const url = new URL(window.location.href);
-        url.searchParams.set('rawHTML', rawHTML);
-        window.history.pushState({}, '', url);
-      });
-      document.body.appendChild(form);
-      if (rawHTML && rawHTML !== '') {
-        console.log('rawHTML', rawHTML)
-        const rawHTMLDiv = document.createElement('div');
-        rawHTMLDiv.innerHTML = rawHTML;
-        document.body.appendChild(rawHTMLDiv);
-      }
-      loadScoutAndProduct(scoutfile, productId, appName);
-      // // load scout file
-      // const script = document.createElement('script');
-      // script.src = scoutfile;
-      // document.head.appendChild(script);
+        appendCapabilities(descriptionList, descriptionDiv);
+        document.body.appendChild(descriptionDiv);
 
-      // // load product
-      // const productDIV = document.createElement('div');
-      // productDIV.id = 'product';
-      // productDIV.setAttribute('data-bv-show', 'reviews');
-      // productDIV.setAttribute('data-bv-product-id', productId);
-      // document.body.appendChild(productDIV);
-    } else {
-      messageDiv.classList.add('error');
-      messageDiv.innerHTML = `Something is wrong! bv.js does not exist for this combination!
+        // add input form area for any raw html the user wants to append to the body
+        document.body.appendChild(generateInputForm(rawHTML));
+        if (rawHTML && rawHTML !== "") {
+          const rawHTMLDiv = document.createElement("div");
+          rawHTMLDiv.innerHTML = rawHTML;
+          document.body.appendChild(rawHTMLDiv);
+        }
+        loadScoutAndProduct(scoutfile, productId, appName);
+      } else {
+        messageDiv.classList.add("error");
+        messageDiv.innerHTML = `Something is wrong! bv.js does not exist for this combination!
       <br>Constructed URL:
       <br>
       <a target="_blank" href="${scoutfile}">${scoutfile}</a>`;
-      message = 'failed';
-      document.body.appendChild(messageDiv);
+        message = "failed";
+        document.body.appendChild(messageDiv);
+      }
+    });
+  } else if (appVersion === "v1") {
+    if (containerPage === "true") {
+      V2_HTML_CONTAINER(scoutfile, appVersion);
+    } else {
+      loadScoutAndProduct(scoutfile, productId, appName);
     }
-  });
-} else if (appVersion === 'v1') {
-  console.log('appVersion', appVersion, scoutfile);
-  if (containerPage === 'true') {
-    // clear everything inside document with container page
-    // document.body.innerHTML = "";
-    // document.head.innerHTML = "";
-    // load container
-    console.log('appVersion', appVersion, scoutfile)
-    // document.write(V2_HTML_CONTAINER(scoutfile, appVersion));
-    V2_HTML_CONTAINER(scoutfile, appVersion);
-  } else {
-    loadScoutAndProduct(scoutfile, productId, appName);
   }
-}
 
-document.body.innerHTML = `<h1>${message}</h1>`;
+  document.body.innerHTML = `<h1>${message}</h1>`;
 }

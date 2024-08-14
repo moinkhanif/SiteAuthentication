@@ -1,3 +1,5 @@
+const webpack = require('webpack');
+
 module.exports = {
   // ... other configuration
   module: {
@@ -14,4 +16,10 @@ module.exports = {
       },
     ],
   },
+  plugins: [
+    new webpack.BannerPlugin({
+      banner: `/*! Build date: ${new Date().toLocaleString()} */`,
+      raw: true,
+    }),
+  ],
 };
