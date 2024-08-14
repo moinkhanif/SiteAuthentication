@@ -108,3 +108,17 @@ export const generateScoutURL = (client, dz, env, locale, appVersion) => {
   }
   return `${domain}${scoutBody}`
 }
+
+export const loadScoutAndProduct = (scoutfile, productId, appName) => {
+  // load scout file
+  const script = document.createElement('script');
+  script.src = scoutfile;
+  document.head.appendChild(script);
+
+  // load product
+  const productDIV = document.createElement('div');
+  productDIV.id = 'product';
+  productDIV.setAttribute('data-bv-show', appName);
+  productDIV.setAttribute('data-bv-product-id', productId);
+  document.body.appendChild(productDIV);
+}

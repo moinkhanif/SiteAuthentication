@@ -15,11 +15,17 @@ const generateV1HTML = (scoutFile) => {
   const script = document.createElement('script');
   script.type = 'text/javascript';
   script.src = scoutFile;
+  script.onload = () => {
+    $BV.container('global', {});
+  };
   document.body.appendChild(script);
 
-  const script2 = document.createElement('script');
-  script2.innerHTML = '$BV.container(\'global\', {} );';
-  document.body.appendChild(script2);
+  // setTimeout(() => {
+  //   $BV.container('global', {} );
+  //   // const script2 = document.createElement('script');
+  //   // script2.innerHTML = `$BV.container('global', {} );`
+  //   // document.body.appendChild(script2);
+  // }, 500)
 }
 const V1HTML = `<!DOCTYPE html>
 <html>
