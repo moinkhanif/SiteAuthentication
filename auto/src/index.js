@@ -111,7 +111,7 @@ if (client === "" || dz === "") {
           rawHTMLDiv.innerHTML = rawHTML;
           document.body.appendChild(rawHTMLDiv);
         }
-        loadScoutAndProduct(scoutfile, productId, appName);
+        loadScoutAndProduct(scoutfile, productId, appName, appVersion);
       } else {
         messageDiv.classList.add("error");
         messageDiv.innerHTML = `Something is wrong! bv.js does not exist for this combination!
