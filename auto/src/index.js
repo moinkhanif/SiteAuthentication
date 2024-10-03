@@ -126,7 +126,7 @@ if (client === "" || dz === "") {
     if (containerPage === "true") {
       V2_HTML_CONTAINER(scoutfile, appVersion);
     } else {
-      loadScoutAndProduct(scoutfile, productId, appName);
+      loadScoutAndProduct(scoutfile, productId, appName, appVersion);
     }
   }
 
