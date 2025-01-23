@@ -125,11 +125,20 @@ export const loadScoutAndProduct = (scoutfile, productId, appName, appVersion) =
 
   // load product
   if (appVersion === "v2") {
+    const url = new URL(window.location.href);
+    const loadInsideShadowRoot = url.searchParams.get("loadInsideShadowRoot") === "true";
     const productDIV = document.createElement("div");
     productDIV.id = "product";
     productDIV.setAttribute("data-bv-show", appName);
     productDIV.setAttribute("data-bv-product-id", productId);
-    document.body.appendChild(productDIV);
+    if (loadInsideShadowRoot) {
+      const shadowRootHost = document.createElement("div");
+      const shadow = shadowRootHost.attachShadow({ mode: "open" });
+      shadow.appendChild(productDIV);
+      document.body.appendChild(shadowRootHost);
+    } else {
+      document.body.appendChild(productDIV);
+    }
   } else {
     console.log('loading v1', productId, appName, appVersion);
     const mainDIV = document.createElement("div");
